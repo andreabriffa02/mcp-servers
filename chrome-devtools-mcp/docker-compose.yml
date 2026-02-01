@@ -1,0 +1,18 @@
+services:
+  chrome-mcp:
+    build: .
+    image: chrome-devtools-mcp:latest
+    container_name: chrome-devtools-mcp
+    # Required for Chrome to run properly in Docker
+    shm_size: '2gb'
+    security_opt:
+      - seccomp=unconfined
+    ports:
+      # SSE endpoint for MCP client connection from your IDE
+      - "${DOCKER_CHROME_DEVTOOLS_PORT:-9223}:${DOCKER_CHROME_DEVTOOLS_PORT:-9223}"
+      # Chrome DevTools debugging port (optional, for direct browser access)
+      - "9222:9222"
+    environment:
+      - CHROME_DEVTOOLS_MCP_NO_USAGE_STATISTICS=1
+      - DOCKER_CHROME_DEVTOOLS_PORT=${DOCKER_CHROME_DEVTOOLS_PORT:-9223}
+    restart: unless-stopped

@@ -1,0 +1,15 @@
+{
+  "enabled": true,
+  "name": "Start Chrome DevTools MCP",
+  "description": "Builds and starts the Chrome DevTools MCP Docker container",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Setup Chrome DevTools MCP container. Follow these steps in order, asking ONE question at a time:\n\nStep 1: Ask for port number (default 9223). Check availability with `lsof -i :<port>`. If in use, ask for another port. Repeat until available.\n\nStep 2: Ask for Docker Hub username to tag the image. Skip if user declines.\n\nStep 3: Build and start with `DOCKER_CHROME_DEVTOOLS_PORT=<port> docker compose up -d --build` in chrome-devtools-mcp directory.\n\nStep 4: If username provided, tag with `docker tag chrome-devtools-mcp:latest <username>/chrome-devtools-mcp:latest`.\n\nStep 5: Ask if user wants Kiro MCP config updated. If yes, add chrome-devtools entry to ~/.kiro/settings/mcp.json with URL http://localhost:<port>/sse.\n\nStep 6: Confirm completion with the running port."
+  },
+  "workspaceFolderName": "mcp-servers",
+  "shortName": "start-chrome-mcp"
+}
