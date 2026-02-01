@@ -4,13 +4,29 @@ Run Chrome DevTools MCP server in a Docker container and connect to it from your
 
 ## Quick Start
 
-1. **Build and run the container:**
+1. **Build the image:**
    ```bash
    cd chrome-devtools-mcp
-   docker compose up -d --build
+   docker build -t chrome-devtools-mcp:latest .
    ```
 
-2. **Verify it's running:**
+2. **Run the container:**
+   ```bash
+   ./run.sh
+   ```
+   
+   Or manually:
+   ```bash
+   docker run -d \
+       --name chrome-devtools-mcp \
+       -p 9223:9223 \
+       -e CHROME_DEVTOOLS_MCP_NO_USAGE_STATISTICS=1 \
+       -e DOCKER_CHROME_DEVTOOLS_PORT=9223 \
+       --restart unless-stopped \
+       chrome-devtools-mcp:latest
+   ```
+
+3. **Verify it's running:**
    ```bash
    # Check container logs
    docker logs chrome-devtools-mcp
@@ -19,7 +35,7 @@ Run Chrome DevTools MCP server in a Docker container and connect to it from your
    curl http://localhost:9223/sse
    ```
 
-3. **Configure your IDE** (see below)
+4. **Configure your IDE** (see below)
 
 ## IDE Configuration
 
@@ -72,19 +88,22 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ### Custom Port
 
-Override the default SSE port (9223) using the `DOCKER_CHROME_DEVTOOLS_PORT` environment variable:
+Use the run script with a custom port:
 
 ```bash
-# Option 1: Inline
-DOCKER_CHROME_DEVTOOLS_PORT=8080 docker compose up -d
+./run.sh 8080
+```
 
-# Option 2: Export
-export DOCKER_CHROME_DEVTOOLS_PORT=8080
-docker compose up -d
+Or manually:
 
-# Option 3: .env file
-echo "DOCKER_CHROME_DEVTOOLS_PORT=8080" > .env
-docker compose up -d
+```bash
+docker run -d \
+    --name chrome-devtools-mcp \
+    -p 8080:8080 \
+    -e CHROME_DEVTOOLS_MCP_NO_USAGE_STATISTICS=1 \
+    -e DOCKER_CHROME_DEVTOOLS_PORT=8080 \
+    --restart unless-stopped \
+    chrome-devtools-mcp:latest
 ```
 
 Then update your IDE mcp config to use the new port (e.g., `http://localhost:8080/sse`).
@@ -96,27 +115,44 @@ If you pulled the image from Docker Hub and want to change the host port:
 ```bash
 docker stop chrome-devtools-mcp
 docker rm chrome-devtools-mcp
-docker run -d --name chrome-devtools-mcp -p <new-host-port>:9223 <docker-tagged-username>/chrome-devtools-mcp:latest
+./run.sh <new-port> briffa/chrome-devtools-mcp:latest
 ```
 
-Replace `<new-host-port>` with your desired port and `<username>` with the Docker Hub username (e.g., `vibe-coder-404`).
+Or manually:
+
+```bash
+docker run -d \
+    --name chrome-devtools-mcp \
+    -p <new-port>:<new-port> \
+    -e CHROME_DEVTOOLS_MCP_NO_USAGE_STATISTICS=1 \
+    -e DOCKER_CHROME_DEVTOOLS_PORT=<new-port> \
+    --restart unless-stopped \
+    briffa/chrome-devtools-mcp:latest
+```
 
 Then update your IDE mcp config to use the new port.
 
 ## Commands
 
 ```bash
+# Build the image
+docker build -t chrome-devtools-mcp:latest .
+
 # Start the container
-docker compose up -d
+./run.sh
 
 # View logs
 docker logs -f chrome-devtools-mcp
 
 # Stop the container
-docker compose down
+docker stop chrome-devtools-mcp
 
-# Rebuild after changes
-docker compose up -d --build
+# Remove the container
+docker rm chrome-devtools-mcp
+
+# Rebuild and restart
+docker build -t chrome-devtools-mcp:latest .
+./run.sh
 ```
 
 ## Troubleshooting
@@ -134,7 +170,7 @@ lsof -i :9222
 3. Test endpoint: `curl http://localhost:9223/sse`
 
 ### Chrome crashes
-The container needs sufficient shared memory. The `shm_size: '2gb'` in docker-compose.yml should handle this, but you can increase it if needed.
+If Chrome on your host machine crashes, ensure you have enough memory available and that no other processes are consuming excessive resources.
 
 ### Run chrome command
 

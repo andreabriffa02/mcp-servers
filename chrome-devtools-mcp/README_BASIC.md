@@ -6,7 +6,7 @@ Run Chrome DevTools MCP in Docker and connect it to your IDE.
 
 - `<host-port>` - The port on your machine (e.g., 9223, 9221). This is what you'll use in your IDE's MCP config URL.
 - `9223` - The port the MCP server exposes inside the container. This stays fixed.
-- `<docker-username>` - The Docker Hub username the image is published under (e.g., `mintoff`).
+- `<docker-username>` - The Docker Hub username the image is published under (e.g., `briffa`).
 - `192.168.65.1` - Default common IP address of Docker on host machine.
 - `9222` - Chrome debugging port (chosen arbitrarily by me)
 

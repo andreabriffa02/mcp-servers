@@ -1,13 +1,12 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
 # Configurable port (default: 9223)
 DOCKER_CHROME_DEVTOOLS_PORT="${DOCKER_CHROME_DEVTOOLS_PORT:-9223}"
 
-# Resolve host.docker.internal to its IPv4 address
-# Chrome rejects non-IP/localhost Host headers for security
-# Use -4 flag to force IPv4 resolution
-HOST_IP=$(getent ahostsv4 host.docker.internal | head -1 | awk '{ print $1 }')
+# Resolve host.docker.internal to IPv4 address
+# Chrome rejects non-IP Host headers for security
+HOST_IP=$(nslookup host.docker.internal 2>/dev/null | grep -A1 "Name:" | grep "Address:" | grep -oE '([0-9]{1,3}\.){3}[0-9]{1,3}' | head -1)
 
 if [ -z "$HOST_IP" ]; then
     echo "ERROR: Could not resolve host.docker.internal to IPv4"
