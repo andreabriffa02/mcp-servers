@@ -67,3 +67,22 @@ docker logs chrome-devtools-mcp    # View logs
 docker stop chrome-devtools-mcp    # Stop
 docker start chrome-devtools-mcp   # Start again
 ```
+
+## Alias setup ~/.zshrc
+
+Notes:
+- Do not use the default chrome profile directory, as it will potentially conflict
+- Passing the `--incognito` flag will not work with the MCP server
+- For the "incognito" debugging script below, `$(mktemp -d -p $CHROME_TMP_FOLDER)` creates a temporary directory each time (mimics incognito mode)
+
+```
+export DOCKER_LOCAL_ADDRESS="192.168.65.1"
+export CHROME="Google Chrome" 
+export CHROME_DEBUG_FOLDER="$HOME/chrome-debug-profile"
+export CHROME_DEBUGGING_PORT=9222
+export CHROME_TMP_FOLDER="$HOME/tmp"
+
+alias chrome-debugging='open -n -a "$CHROME" --args --user-data-dir=$CHROME_DEBUG_FOLDER --profile-directory="Default" --disable-web-security --no-first-run --no-default-browser-check --remote-debugging-port="$CHROME_DEBUGGING_PORT" --remote-debugging-address="$DOCKER_LOCAL_ADDRESS"'
+
+alias chrome-incognito-debugging='rm -rf "$CHROME_TMP_FOLDER" && mkdir -p "$CHROME_TMP_FOLDER" && open -n -a "$CHROME" --args --user-data-dir="$(mktemp -d -p $CHROME_TMP_FOLDER)" --profile-directory="Default" --disable-web-security --no-first-run --no-default-browser-check --remote-debugging-port="$CHROME_DEBUGGING_PORT" --remote-debugging-address="$DOCKER_LOCAL_ADDRESS"'
+```
